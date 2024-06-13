@@ -3,7 +3,7 @@ import { hash } from "bcryptjs";
 import { connectDB } from "./db";
 import User from "./schema";
 import { redirect } from "next/navigation";
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 // import { signIn } from "next-auth/react";
 
 // 회원가입
@@ -59,4 +59,9 @@ export async function login(formData: FormData) {
 
 export async function githubLogin() {
   await signIn("gihub", { callbackUrl: "/" });
+}
+
+// 로그아웃
+export async function logOut(formData: FormData) {
+  await signOut();
 }

@@ -50,22 +50,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: async ({ user, account }: any) => {
       console.log("signIn", user, account);
       if (account?.provider === "github") {
-        // github 소셜 로그인을 위한 로직
         const { name, email } = user;
-        await connectDB();
-        // const existingUser = await User.findOne({email});
-        const existingUser = await User.findOne({ authProviderId: user.id });
+        await connectDB(); // mongodb 연결
+        const existingUser = await User.findOne({
+          email,
+          authProviderId: "github",
+        });
         if (!existingUser) {
+          // 소셜 가입
           await new User({
             name,
             email,
-            authProviderId: user.id,
+            authProviderId: "github",
             role: "user",
           }).save();
         }
-        const socialUser = await User.findOne({ authProviderId: user.id });
-        user.role = socialUser.role || "user";
-        user.id = socialUser?.id || null;
+        const socialUser = await User.findOne({
+          email,
+          authProviderId: "github",
+        });
+        user.role = socialUser?.role || "user";
+        user.id = socialUser?._id || null;
         return true;
       } else {
         return true;
